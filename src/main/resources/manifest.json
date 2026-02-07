@@ -1,0 +1,14 @@
+{
+  "Group": "dev.zacx.worldtemplates",
+  "Name": "WorldTemplates",
+  "Version": "1.0.0",
+  "Description": "Create instances from YAML template files with prefab placement",
+  "Authors": [
+    { "Name": "Zac", "Email": "", "Url": "" }
+  ],
+  "Main": "dev.zacx.worldtemplates.WorldTemplatesPlugin",
+  "Dependencies": {
+    "Hytale:Instances": "*"
+  },
+  "IncludesAssetPack": true
+}

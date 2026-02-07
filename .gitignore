@@ -1,0 +1,22 @@
+# Gradle
+.gradle/
+build/
+gradle-home/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+*.jar
+*.war
+
+# Logs
+*.log

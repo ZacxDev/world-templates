@@ -1,0 +1,67 @@
+# Example World Template
+# Template files define world instances that can be created with /worldtemplate:create
+
+name: example-arena
+displayName: "Battle Arena"
+
+# Spawn point where players appear
+# All prefab positions are RELATIVE to this point
+spawnPoint:
+  x: 0.0
+  y: 65.0
+  z: 0.0
+  yaw: 180.0   # Face south (-Z)
+  pitch: 0.0
+
+# World settings (all optional - defaults used if not specified)
+worldSettings:
+  gameMode: Survival        # Survival, Creative, Adventure
+  forcedWeather: Zone1_Sunny # Weather type to force
+  gameTimePaused: true      # Freeze day/night cycle
+  gameTime: "12:00"         # Time of day (HH:MM format)
+  spawningNPC: false        # Disable mob spawning
+  allNPCFrozen: false       # Don't freeze existing NPCs
+  pvpEnabled: true          # Enable player combat
+  fallDamageEnabled: true   # Enable fall damage
+  ticking: true             # World ticks (physics, etc)
+  blockTicking: true        # Block updates (redstone, etc)
+  # gameplayConfig: "Default"           # Gameplay preset
+  # daytimeDurationSeconds: 600         # Day length override
+  # nighttimeDurationSeconds: 420       # Night length override
+
+# Instance lifecycle settings
+instanceSettings:
+  removalCondition: WorldEmpty  # When to delete: WorldEmpty, Never, timeout:300, idle:60
+  preventReconnection: false    # Kick players back to return point on reconnect
+  deleteOnRemove: true          # Delete world files when removed
+
+# Prefabs to place (positions relative to spawn point)
+# Prefab paths are relative to Server/Prefabs/
+prefabs:
+  - id: arena_floor
+    path: Custom/arena_floor.prefab.json
+    x: 0.0
+    y: -1.0    # One block below spawn
+    z: 0.0
+    rotation: None   # None, CW90, CW180, CW270
+
+  - id: north_wall
+    path: Custom/arena_wall.prefab.json
+    x: 0.0
+    y: -1.0
+    z: -25.0
+    rotation: None
+
+  - id: south_wall
+    path: Custom/arena_wall.prefab.json
+    x: 0.0
+    y: -1.0
+    z: 25.0
+    rotation: CW180
+
+  - id: spawn_platform
+    path: Custom/spawn_platform.prefab.json
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    rotation: None

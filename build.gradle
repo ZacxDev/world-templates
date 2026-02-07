@@ -1,0 +1,45 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '9.0.0-beta12'
+}
+
+group = 'dev.zacx'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "hytale-release"
+        url = uri("https://maven.hytale.com/release")
+    }
+    maven {
+        name = "hytale-pre-release"
+        url = uri("https://maven.hytale.com/pre-release")
+    }
+}
+
+dependencies {
+    compileOnly 'com.hypixel.hytale:Server:2026.01.28-87d03be09'
+    implementation 'org.yaml:snakeyaml:2.2'
+}
+
+shadowJar {
+    archiveClassifier.set('')
+    archiveBaseName.set('WorldTemplates')
+
+    // Note: relocation disabled due to shadow plugin ASM not supporting Java 25 yet
+    // If conflicts arise with other plugins using snakeyaml, update shadow plugin
+}
+
+tasks.named('jar') {
+    enabled = false
+}
+
+tasks.named('build') {
+    dependsOn shadowJar
+}

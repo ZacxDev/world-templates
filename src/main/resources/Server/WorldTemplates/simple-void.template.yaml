@@ -1,0 +1,25 @@
+# Simple Void Template
+# A minimal template with no prefabs - just an empty void world
+
+name: simple-void
+displayName: "Empty Void"
+
+spawnPoint:
+  x: 0.0
+  y: 64.0
+  z: 0.0
+  yaw: 0.0
+  pitch: 0.0
+
+worldSettings:
+  gameMode: Creative
+  gameTimePaused: true
+  gameTime: "12:00"
+  spawningNPC: false
+
+instanceSettings:
+  removalCondition: WorldEmpty
+  deleteOnRemove: true
+
+# No prefabs - pure void
+prefabs: []

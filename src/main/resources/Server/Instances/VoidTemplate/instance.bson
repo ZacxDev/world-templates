@@ -1,0 +1,43 @@
+{
+  "Version": 4,
+  "Seed": 0,
+  "SpawnProvider": {
+    "Type": "Global",
+    "SpawnPoint": {
+      "Position": { "X": 0.0, "Y": 64.0, "Z": 0.0 },
+      "Rotation": { "X": 0.0, "Y": 0.0, "Z": 0.0 }
+    }
+  },
+  "WorldGen": {
+    "Type": "Void"
+  },
+  "WorldMap": {
+    "Type": "WorldGen"
+  },
+  "ChunkStorage": {
+    "Type": "Empty"
+  },
+  "ChunkConfig": {},
+  "IsTicking": true,
+  "IsBlockTicking": false,
+  "IsPvpEnabled": false,
+  "IsFallDamageEnabled": true,
+  "IsGameTimePaused": true,
+  "IsSpawningNPC": false,
+  "IsSpawnMarkersEnabled": false,
+  "IsAllNPCFrozen": false,
+  "GameplayConfig": "Default",
+  "ForcedWeather": "Zone1_Sunny",
+  "IsCompassUpdating": false,
+  "IsSavingPlayers": false,
+  "IsSavingChunks": false,
+  "SaveNewChunks": false,
+  "IsUnloadingChunks": true,
+  "IsObjectiveMarkersEnabled": false,
+  "DeleteOnUniverseStart": false,
+  "DeleteOnRemove": true,
+  "ResourceStorage": {
+    "Type": "Empty"
+  },
+  "Plugin": {}
+}
