@@ -116,6 +116,25 @@ public class WorldSpawner {
     }
 
     /**
+     * Apply template settings and paste prefabs to an existing world.
+     * Used for auto-setup of default/named worlds that match a template.
+     *
+     * @param world    The existing world to configure
+     * @param template The template to apply
+     * @return CompletableFuture that completes when prefabs are pasted
+     */
+    @Nonnull
+    public CompletableFuture<Void> applyToExistingWorld(@Nonnull World world, @Nonnull WorldTemplate template) {
+        logger.atInfo().log("Applying template '%s' to existing world '%s'",
+            template.getDisplayName(), world.getName());
+
+        applyTemplateSettings(world, template);
+
+        // Paste prefabs on world thread
+        return pastePrefabs(world, template);
+    }
+
+    /**
      * Apply template settings to the world config.
      */
     private void applyTemplateSettings(@Nonnull World world, @Nonnull WorldTemplate template) {
