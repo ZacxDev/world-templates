@@ -111,6 +111,7 @@ public class WorldTemplatesPlugin extends JavaPlugin {
     /**
      * Handle PlayerReadyEvent to teleport players to the lobby.
      * This fires after the player is fully ready in the world.
+     * Note: PlayerReadyEvent fires on Scheduler thread, so store access must be on world thread.
      */
     private void onPlayerReady(@Nonnull PlayerReadyEvent event) {
         com.hypixel.hytale.server.core.entity.entities.Player player = event.getPlayer();
@@ -127,48 +128,51 @@ public class WorldTemplatesPlugin extends JavaPlugin {
             return;
         }
 
-        // Get username from PlayerRef component
-        Store<EntityStore> initialStore = entityRef.getStore();
-        PlayerRef playerRefComponent = initialStore.getComponent(entityRef, PlayerRef.getComponentType());
-        String username = playerRefComponent != null ? playerRefComponent.getUsername() : "Unknown";
+        // Must access store on world thread - schedule the entire operation
+        currentWorld.execute(() -> {
+            // Get username from PlayerRef component (now on world thread)
+            Store<EntityStore> store = entityRef.getStore();
+            PlayerRef playerRefComponent = store.getComponent(entityRef, PlayerRef.getComponentType());
+            String username = playerRefComponent != null ? playerRefComponent.getUsername() : "Unknown";
 
-        getLogger().atInfo().log("Player %s ready in default world, will teleport to lobby after delay...", username);
+            getLogger().atInfo().log("Player %s ready in default world, will teleport to lobby after delay...", username);
 
-        // Delay teleport to let client fade-in complete (prevents "Cannot start fade out" crash)
-        // Use 2 second delay to ensure fade animation completes
-        HytaleServer.SCHEDULED_EXECUTOR.schedule(() -> {
-            // Get or create the lobby instance, then teleport
-            getOrCreateLobby(currentWorld).thenAccept(lobby -> {
-                if (lobby == null) {
-                    getLogger().atWarning().log("Failed to get/create lobby for player %s", username);
-                    return;
-                }
-
-                // Teleport player to lobby on the world thread
-                currentWorld.execute(() -> {
-                    // Check if entity ref is still valid
-                    if (!entityRef.isValid()) {
-                        getLogger().atWarning().log("Player %s entity ref became invalid before teleport", username);
+            // Delay teleport to let client fade-in complete (prevents "Cannot start fade out" crash)
+            // Use 2 second delay to ensure fade animation completes
+            HytaleServer.SCHEDULED_EXECUTOR.schedule(() -> {
+                // Get or create the lobby instance, then teleport
+                getOrCreateLobby(currentWorld).thenAccept(lobby -> {
+                    if (lobby == null) {
+                        getLogger().atWarning().log("Failed to get/create lobby for player %s", username);
                         return;
                     }
 
-                    Store<EntityStore> store = entityRef.getStore();
-                    TransformComponent transform = store.getComponent(entityRef, TransformComponent.getComponentType());
-                    if (transform == null) {
-                        getLogger().atWarning().log("Player %s has no transform component", username);
-                        return;
-                    }
+                    // Teleport player to lobby on the world thread
+                    currentWorld.execute(() -> {
+                        // Check if entity ref is still valid
+                        if (!entityRef.isValid()) {
+                            getLogger().atWarning().log("Player %s entity ref became invalid before teleport", username);
+                            return;
+                        }
 
-                    Transform returnTransform = new Transform(
-                        transform.getPosition().clone(),
-                        transform.getRotation().clone()
-                    );
+                        Store<EntityStore> teleportStore = entityRef.getStore();
+                        TransformComponent transform = teleportStore.getComponent(entityRef, TransformComponent.getComponentType());
+                        if (transform == null) {
+                            getLogger().atWarning().log("Player %s has no transform component", username);
+                            return;
+                        }
 
-                    InstancesPlugin.teleportPlayerToInstance(entityRef, store, lobby, returnTransform);
-                    getLogger().atInfo().log("Teleported %s to lobby", username);
+                        Transform returnTransform = new Transform(
+                            transform.getPosition().clone(),
+                            transform.getRotation().clone()
+                        );
+
+                        InstancesPlugin.teleportPlayerToInstance(entityRef, teleportStore, lobby, returnTransform);
+                        getLogger().atInfo().log("Teleported %s to lobby", username);
+                    });
                 });
-            });
-        }, 2000, TimeUnit.MILLISECONDS);
+            }, 2000, TimeUnit.MILLISECONDS);
+        });
     }
 
     /**
