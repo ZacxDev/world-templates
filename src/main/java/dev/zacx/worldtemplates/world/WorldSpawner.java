@@ -81,13 +81,8 @@ public class WorldSpawner {
         logger.atInfo().log("Creating world from template '%s' for player %s",
             template.getDisplayName(), playerRef.getUsername());
 
-        // Spawn the instance
+        // Spawn the instance (includes settings and prefabs)
         return spawnInstance(template, originWorld, returnTransform)
-            .thenCompose(world -> {
-                // Paste prefabs on world thread
-                return pastePrefabs(world, template)
-                    .thenApply(v -> world);
-            })
             .thenApply(world -> {
                 // Teleport player to instance
                 teleportPlayer(playerRef, originWorld, world, returnTransform);
@@ -96,10 +91,16 @@ public class WorldSpawner {
     }
 
     /**
-     * Spawn an instance world from template settings.
+     * Spawn an instance world from template settings (without prefabs, without teleport).
+     * Used internally and for creating shared instances like lobby.
+     *
+     * @param template       The template to use
+     * @param originWorld    The origin world for instance creation
+     * @param returnTransform The return transform for instance exit
+     * @return CompletableFuture with the created world (settings applied, prefabs pasted)
      */
     @Nonnull
-    private CompletableFuture<World> spawnInstance(
+    public CompletableFuture<World> spawnInstance(
         @Nonnull WorldTemplate template,
         @Nonnull World originWorld,
         @Nonnull Transform returnTransform
@@ -112,6 +113,10 @@ public class WorldSpawner {
             .thenApply(world -> {
                 applyTemplateSettings(world, template);
                 return world;
+            })
+            .thenCompose(world -> {
+                // Paste prefabs and return the world when done
+                return pastePrefabs(world, template).thenApply(v -> world);
             });
     }
 
